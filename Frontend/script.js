@@ -8,7 +8,7 @@ const buttonText = document.getElementById("button-text");
 const shortenMessage = document.getElementById("shorten-message");
 
 const resultBox = document.getElementById("result");
-const shortLinkElement = document.getElementById("short-link");
+const shortLink = document.getElementById("short-link");
 const copyButton = document.getElementById("copy-button");
 
 const analyticsForm = document.getElementById("analytics-form");
@@ -17,9 +17,8 @@ const analyticsButton = document.getElementById("analytics-button");
 const analyticsMessage = document.getElementById("analytics-message");
 
 const analyticsResult = document.getElementById("analytics-result");
-const clickCountElement = document.getElementById("click-count");
-const analyticsUrlElement = document.getElementById("analytics-url");
-
+const clickCount = document.getElementById("click-count");
+const analyticsUrl = document.getElementById("analytics-url");
 
 function showMessage(element, message, type = "") {
     element.textContent = message;
@@ -30,28 +29,21 @@ function showMessage(element, message, type = "") {
     }
 }
 
-
-function hideResult(element) {
-    element.classList.add("hidden");
+function makeShortUrl(code) {
+    return `${API_BASE}/${encodeURIComponent(code)}`;
 }
 
-
-function makeShortUrl(shortCode) {
-    return `${API_BASE}/${encodeURIComponent(shortCode)}`;
-}
-
-
-// Create a short URL
+// Shorten a URL
 shortenForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const originalUrl = longUrlInput.value.trim();
+    const url = longUrlInput.value.trim();
 
     showMessage(shortenMessage, "");
-    hideResult(resultBox);
+    resultBox.classList.add("hidden");
 
     shortenButton.disabled = true;
-    buttonText.textContent = "Creating link...";
+    buttonText.textContent = "Creating...";
 
     try {
         const response = await fetch(`${API_BASE}/urls`, {
@@ -59,92 +51,68 @@ shortenForm.addEventListener("submit", async function (event) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                url: originalUrl
-            })
+            body: JSON.stringify({ url: url })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            const detail = Array.isArray(data.detail)
-                ? data.detail.map(item => item.msg).join(", ")
-                : data.detail;
-
-            throw new Error(detail || "Could not create the short URL.");
+            throw new Error(
+                typeof data.detail === "string"
+                    ? data.detail
+                    : "Could not create the short URL."
+            );
         }
 
         if (!data.short_code) {
-            throw new Error("The backend did not return a short code.");
+            throw new Error("No short code received from the backend.");
         }
 
         const shortUrl = makeShortUrl(data.short_code);
 
-        shortLinkElement.textContent = shortUrl;
-        shortLinkElement.href = shortUrl;
+        shortLink.href = shortUrl;
+        shortLink.textContent = shortUrl;
 
-        // Fill the analytics form with the newly created short code.
         shortCodeInput.value = data.short_code;
-
         resultBox.classList.remove("hidden");
 
-        showMessage(
-            shortenMessage,
-            "Short URL created successfully.",
-            "success"
-        );
+        showMessage(shortenMessage, "Short URL created successfully.", "success");
 
     } catch (error) {
         showMessage(
             shortenMessage,
             error.message === "Failed to fetch"
-                ? "Cannot connect to the backend. Check that FastAPI is running and CORS is configured."
+                ? "Cannot connect to the backend. Check that FastAPI is running."
                 : error.message,
             "error"
         );
-
     } finally {
         shortenButton.disabled = false;
-        buttonText.textContent = "Generate short link";
+        buttonText.textContent = "Shorten URL";
     }
 });
 
-
-// Copy the generated short URL
+// Copy the short URL
 copyButton.addEventListener("click", async function () {
-    const shortUrl = shortLinkElement.href;
-
     try {
-        await navigator.clipboard.writeText(shortUrl);
-
+        await navigator.clipboard.writeText(shortLink.href);
         copyButton.textContent = "Copied!";
-
-        setTimeout(() => {
-            copyButton.textContent = "Copy link";
-        }, 1500);
-
-    } catch (error) {
-        // Fallback for browsers that do not allow clipboard access.
-        window.prompt("Copy your short URL:", shortUrl);
+    } catch {
+        window.prompt("Copy this URL:", shortLink.href);
     }
 });
 
-
-// Get analytics for a short code
+// Check click statistics
 analyticsForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const shortCode = shortCodeInput.value.trim();
+    const code = shortCodeInput.value.trim();
 
     showMessage(analyticsMessage, "");
-    hideResult(analyticsResult);
+    analyticsResult.classList.add("hidden");
 
-    if (!shortCode) {
-        showMessage(
-            analyticsMessage,
-            "Please enter a short code.",
-            "error"
-        );
+    if (!code) {
+        showMessage(analyticsMessage, "Enter a short code.", "error");
         return;
     }
 
@@ -153,31 +121,25 @@ analyticsForm.addEventListener("submit", async function (event) {
 
     try {
         const response = await fetch(
-            `${API_BASE}/analytics/${encodeURIComponent(shortCode)}`
+            `${API_BASE}/analytics/${encodeURIComponent(code)}`
         );
 
         const data = await response.json();
 
         if (!response.ok) {
-            const detail = Array.isArray(data.detail)
-                ? data.detail.map(item => item.msg).join(", ")
-                : data.detail;
-
-            throw new Error(detail || "Could not retrieve analytics.");
+            throw new Error(
+                typeof data.detail === "string"
+                    ? data.detail
+                    : "Could not retrieve statistics."
+            );
         }
 
-        clickCountElement.textContent = data.click_count;
-
-        analyticsUrlElement.textContent = data.original_url;
-        analyticsUrlElement.href = data.original_url;
+        clickCount.textContent = data.click_count;
+        analyticsUrl.textContent = data.original_url;
+        analyticsUrl.href = data.original_url;
 
         analyticsResult.classList.remove("hidden");
-
-        showMessage(
-            analyticsMessage,
-            "Analytics loaded successfully.",
-            "success"
-        );
+        showMessage(analyticsMessage, "Statistics loaded.", "success");
 
     } catch (error) {
         showMessage(
@@ -187,9 +149,8 @@ analyticsForm.addEventListener("submit", async function (event) {
                 : error.message,
             "error"
         );
-
     } finally {
         analyticsButton.disabled = false;
-        analyticsButton.textContent = "Check stats";
+        analyticsButton.textContent = "Check Clicks";
     }
 });
