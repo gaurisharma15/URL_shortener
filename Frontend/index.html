@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL-Shortener - URL Shortener</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="#" class="logo"><span class="logo-icon">↗</span> URL-Shortener</a>
+        <span class="nav-label">URL SHORTENER</span>
+    </header>
+
+    <main class="container">
+
+        <section class="hero">
+            <div class="eyebrow"><span class="status-dot"></span> SIMPLE. FAST. TRACKABLE.</div>
+
+            <h1>Short links.<br><span>More possibilities.</span></h1>
+
+            <p class="subtitle">
+                Turn long URLs into short links and track how many times
+                they're clicked. Everything you need, in one place.
+            </p>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Create a short link</h2>
+                    <p>Paste your long URL below to get started.</p>
+                </div>
+                <span class="step-number">01</span>
+            </div>
+
+            <form id="shorten-form">
+                <label for="long-url">Destination URL</label>
+
+                <div class="input-wrap">
+                    <span class="input-icon">↗</span>
+                    <input
+                        type="url"
+                        id="long-url"
+                        placeholder="https://example.com/your/long/link"
+                        required
+                    >
+                </div>
+
+                <button type="submit" id="shorten-button">
+                    <span id="button-text">Generate short link</span>
+                    <span aria-hidden="true"> →</span>
+                </button>
+            </form>
+
+            <p id="shorten-message" class="message" role="status"></p>
+
+            <div id="result" class="result hidden">
+                <div class="result-heading">
+                    <span class="success-icon">✓</span>
+                    <span>Your link is ready</span>
+                </div>
+
+                <div class="short-link-row">
+                    <a id="short-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                    <button type="button" id="copy-button" class="copy-button">
+                        Copy link
+                    </button>
+                </div>
+
+                <p class="result-note">
+                    Open your short link to test the redirect.
+                </p>
+            </div>
+        </section>
+
+        <section class="panel analytics-panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Link analytics</h2>
+                    <p>Check the click count for any shortened link.</p>
+                </div>
+                <span class="step-number">02</span>
+            </div>
+
+            <form id="analytics-form">
+                <label for="short-code">Short code</label>
+
+                <div class="analytics-input-row">
+                    <div class="input-wrap">
+                        <span class="input-icon">#</span>
+                        <input
+                            type="text"
+                            id="short-code"
+                            placeholder="Enter your short code"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" id="analytics-button">
+                        Check stats
+                    </button>
+                </div>
+            </form>
+
+            <p id="analytics-message" class="message" role="status"></p>
+
+            <div id="analytics-result" class="analytics-result hidden">
+                <div class="stat-card">
+                    <span class="stat-label">TOTAL CLICKS</span>
+                    <span id="click-count" class="click-count">0</span>
+                    <span class="stat-caption">Recorded visits</span>
+                </div>
+
+                <div class="destination-card">
+                    <span class="stat-label">DESTINATION URL</span>
+                    <a
+                        id="analytics-url"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    ></a>
+                    <span class="stat-caption">Original destination</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature">
+                <span class="feature-icon">↗</span>
+                <h3>Quick redirects</h3>
+                <p>Short links redirect visitors to the original URL.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">▤</span>
+                <h3>Reliable storage</h3>
+                <p>PostgreSQL stores your links and click counts.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">⌁</span>
+                <h3>Click tracking</h3>
+                <p>Check visits using your link's short code.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <span class="footer-logo">URL-Shortener</span>
+        <span>Built with HTML, CSS, JavaScript & FastAPI</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
